@@ -4,146 +4,79 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Minimalist Start Page</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&display=swap">
   <style>
-    @font-face {
-      font-family: 'JetBrains Mono';
-      src: url('https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap');
-    }
-
     body {
-      margin: 0;
-      padding: 12px;
-      height: 100vh;
-      display: flex;
-      background: #000000;
-      /* Changed to pitch black */
-      color: #ffffff;
-      font-family: 'JetBrains Mono', monospace;
-      overflow: hidden;
+      background-color: #000000;
+      font-family: 'JetBrains Mono', Arial, sans-serif;
     }
 
-    .container {
-      display: flex;
-      width: 100%;
-      height: 100%;
-    }
-
-    .left {
-      width: 50%;
-      /* Changed to make both sides equal */
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    .bookmarks ul {
-      list-style: none;
-      padding: 0;
-    }
-
-    .bookmarks li {
-      margin: 10px 0;
-    }
-
-    .bookmarks a {
-      color: #ffffff;
+    a {
       text-decoration: none;
-      font-size: 1.1em;
+      color: #ffffff;
     }
 
-    .bookmarks a:hover {
+    a:hover {
       text-decoration: underline;
     }
 
-    .right {
-      width: 50%;
-      /* Changed to make both sides equal */
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow: hidden;
-    }
-
-    .slideshow img {
-      max-width: 80%;
-      max-height: 80%;
-      object-fit: cover;
-      border-radius: 20px;
-      transition: opacity 1s ease-in-out;
-    }
-
-    .fade {
-      opacity: 0;
+    .add-btn {
+      color: #ff6200;
+      cursor: pointer;
     }
   </style>
+  <title>M</title>
 </head>
 
 <body>
-  <div class="container">
-    <div class="left">
-      <div class="bookmarks">
-        <ul id="bookmark-list">
-          <!-- Bookmarks will be added here via JavaScript -->
-        </ul>
-      </div>
-    </div>
-    <div class="right">
-      <div class="slideshow">
-        <img id="slideshow-image" src="" alt="Slideshow Image">
-      </div>
-    </div>
-  </div>
+
+  <div class="add-btn" onclick="addLink()">Add</div>
 
   <script>
-    // Bookmarks (editable)
-    const bookmarks = [
-      { name: 'Google', url: 'https://www.google.com' },
-      { name: 'GitHub', url: 'https://github.com' },
-      { name: 'X', url: 'https://x.com' }
-    ];
+    function addLink() {
+      const url = prompt("Enter the URL:");
+      const name = prompt("Enter the name for the link:");
 
-    // Populate bookmarks
-    const bookmarkList = document.getElementById('bookmark-list');
-    bookmarks.forEach(bookmark => {
-      const li = document.createElement('li');
-      const a = document.createElement('a');
-      a.href = bookmark.url;
-      a.textContent = bookmark.name;
-      li.appendChild(a);
-      bookmarkList.appendChild(li);
-    });
-
-    // Slideshow functionality
-    const imageElement = document.getElementById('slideshow-image');
-    let useLocalImages = true; // Set to true to use local ./walls folder
-    const localImages = [
-      './walls/image1.jpg',
-      './walls/image2.jpg',
-      './walls/image3.jpg'
-      // Add paths to images in ./walls folder
-    ];
-
-
-    function getLocalImage() {
-      return localImages[Math.floor(Math.random() * localImages.length)];
+      if (url && name) {
+        const newLink = document.createElement('a');
+        newLink.href = url;
+        newLink.textContent = name;
+        newLink.style.display = 'block'; // To put each link on a new line
+        document.body.appendChild(newLink);
+        saveLinks(); // Save links after adding a new one
+      } else {
+        alert("URL and name are required.");
+      }
     }
 
-    async function changeImage() {
-      imageElement.classList.add('fade');
-      const imageUrl = useLocalImages ? getLocalImage() : await fetchUnsplashImage();
-      setTimeout(() => {
-        imageElement.src = imageUrl;
-        imageElement.classList.remove('fade');
-      }, 1000);
+    function saveLinks() {
+      const links = [];
+      const linkElements = document.querySelectorAll('a');
+      linkElements.forEach(link => {
+        links.push({
+          href: link.href,
+          textContent: link.textContent
+        });
+      });
+      localStorage.setItem('savedLinks', JSON.stringify(links));
+      alert('Links saved!');
     }
 
-    // Initial image load
-    changeImage();
+    function loadLinks() {
+      const savedLinks = localStorage.getItem('savedLinks');
+      if (savedLinks) {
+        const links = JSON.parse(savedLinks);
+        links.forEach(link => {
+          const newLink = document.createElement('a');
+          newLink.href = link.href;
+          newLink.textContent = link.textContent;
+          newLink.style.display = 'block';
+          document.body.appendChild(newLink);
+        });
+      }
+    }
 
-    // Change image every 10 seconds
-    setInterval(changeImage, 10000);
+    window.onload = loadLinks;
   </script>
 </body>
 
