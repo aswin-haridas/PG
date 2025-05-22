@@ -25,6 +25,17 @@
       cursor: pointer;
     }
 
+    .link-container {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 30%;
+      height: 100%;
+      background-color: #000000;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
     #particle-container {
       position: absolute;
       right: 0;
@@ -45,7 +56,9 @@
 
 <body>
 
-  <div class="add-btn" onclick="addLink()">Add</div>
+  <div class="link-container">
+    <div class="add-btn" onclick="addLink()">Add</div>
+  </div>
 
   <div id="particle-container">
     <div id="wrap"></div>
@@ -100,58 +113,44 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const bootContainer = document.getElementById('boot-container');
+      const bootContainer = document.getElementById('boot-container'); // This variable is not used in the particle script
       const wrap = document.getElementById('wrap');
 
       const totalParticles = 300;
       const particleSize = '2px';
-      const orbSize = '100px';
+      const orbSize = '100px'; // Used as a general scale for movement/offsets
       const time = '14s';
       const accentColor = '#FFFFFF';
 
-      const timeInMs = 14 * 1000; // 14 seconds in milliseconds
-
-      // Function to navigate after animation (simulated)
-      const navigateToEditor = () => {
-          console.log('Navigating to /editor (simulation complete!)');
-          // In a real vanilla JS application, you'd typically change the URL:
-          // window.location.href = '/editor';
-          // Or dynamically load new content
-          alert('Simulation complete! You would now navigate to the editor page.');
-      };
-
-      // Set up navigation after animation completes
-      setTimeout(navigateToEditor, timeInMs);
-
-      // Convert hex color to HSL
+      // hexToHSL function remains unchanged
       const hexToHSL = (hex) => {
-          hex = hex.replace(/^#/, '');
-          const r = parseInt(hex.slice(0, 2), 16) / 255;
-          const g = parseInt(hex.slice(2, 4), 16) / 255;
-          const b = parseInt(hex.slice(4, 6), 16) / 255;
+        hex = hex.replace(/^#/, '');
+        const r = parseInt(hex.slice(0, 2), 16) / 255;
+        const g = parseInt(hex.slice(2, 4), 16) / 255;
+        const b = parseInt(hex.slice(4, 6), 16) / 255;
 
-          const max = Math.max(r, g, b);
-          const min = Math.min(r, g, b);
-          let h, s, l = (max + min) / 2;
+        const max = Math.max(r, g, b);
+        const min = Math.min(r, g, b);
+        let h, s, l = (max + min) / 2;
 
-          if (max === min) {
-              h = s = 0; // achromatic
-          } else {
-              const d = max - min;
-              s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-              switch (max) {
-                  case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-                  case g: h = (b - r) / d + 2; break;
-                  case b: h = (r - g) / d + 4; break;
-              }
-              h /= 6;
+        if (max === min) {
+          h = s = 0; // achromatic
+        } else {
+          const d = max - min;
+          s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+          switch (max) {
+            case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+            case g: h = (b - r) / d + 2; break;
+            case b: h = (r - g) / d + 4; break;
           }
+          h /= 6;
+        }
 
-          return {
-              h: Math.round(h * 360),
-              s: Math.round(s * 100),
-              l: Math.round(l * 100)
-          };
+        return {
+          h: Math.round(h * 360),
+          s: Math.round(s * 100),
+          l: Math.round(l * 100)
+        };
       };
 
       const { h: baseHue } = hexToHSL(accentColor);
@@ -159,22 +158,56 @@
       // Generate and append keyframes dynamically
       const style = document.createElement('style');
       let keyframes = '';
+      const orbSizeNum = parseFloat(orbSize);
 
       for (let i = 1; i <= totalParticles; i++) {
-          keyframes += `
-              @keyframes orbit${i} {
+        // Random values for this particle's animation path
+        const randomYStartFactor = (Math.random() - 0.5) * 90; // Spread within ~90vh
+        const randomYMidFactor = (Math.random() - 0.5) * 80;   // Slightly less spread mid-animation
+        const randomYEndFactor = (Math.random() - 0.5) * 90;
+
+        const randomStartXOffset = Math.random() * 50;
+        const randomEndXOffset = Math.random() * 50;
+
+        const randomMidXOffsetFactor = (Math.random() - 0.5);
+
+        const randomStartScale = 0.5 + Math.random() * 0.5;
+        const randomEndScale = 0.5 + Math.random() * 0.5;
+
+        const randomRotZ1 = Math.random() * 360; const randomRotY1 = Math.random() * 360;
+        const randomRotZ2 = Math.random() * 360; const randomRotY2 = Math.random() * 360;
+        const randomRotZ3 = Math.random() * 360; const randomRotY3 = Math.random() * 360;
+        const randomRotZ4 = Math.random() * 360; const randomRotY4 = Math.random() * 360;
+
+        keyframes += `
+              @keyframes flowParticle${i} {
+                  0% {
+                      transform: translateX(calc(35vw + ${orbSizeNum}px + ${randomStartXOffset}px)) 
+                                 translateY(${randomYStartFactor}vh)
+                                 rotateZ(${randomRotZ1}deg) rotateY(${randomRotY1}deg)
+                                 scale(${randomStartScale});
+                      opacity: 0;
+                  }
                   20% {
+                      transform: translateX(calc(25vw + ${randomMidXOffsetFactor * orbSizeNum}px))
+                                 translateY(${randomYMidFactor}vh)
+                                 rotateZ(${randomRotZ2}deg) rotateY(${randomRotY2}deg)
+                                 scale(1);
                       opacity: 1;
                   }
-                  30% {
-                      transform: rotateZ(${Math.random() * 360}deg) rotateY(${Math.random() * 360}deg) translateX(${orbSize}) rotateZ(${Math.random() * 360}deg);
-                  }
                   80% {
-                      transform: rotateZ(${Math.random() * 360}deg) rotateY(${Math.random() * 360}deg) translateX(${orbSize}) rotateZ(${Math.random() * 360}deg);
+                      transform: translateX(calc(-25vw - ${randomMidXOffsetFactor * orbSizeNum}px))
+                                 translateY(${randomYMidFactor}vh)
+                                 rotateZ(${randomRotZ3}deg) rotateY(${randomRotY3}deg)
+                                 scale(1);
                       opacity: 1;
                   }
                   100% {
-                      transform: rotateZ(${Math.random() * 360}deg) rotateY(${Math.random() * 360}deg) translateX(calc(${orbSize} * 3)) rotateZ(${Math.random() * 360}deg);
+                      transform: translateX(calc(-35vw - ${orbSizeNum}px - ${randomEndXOffset}px))
+                                 translateY(${randomYEndFactor}vh)
+                                 rotateZ(${randomRotZ4}deg) rotateY(${randomRotY4}deg)
+                                 scale(${randomEndScale});
+                      opacity: 0;
                   }
               }
           `;
@@ -184,15 +217,20 @@
 
       // Create and append particles
       for (let i = 1; i <= totalParticles; i++) {
-          const particle = document.createElement('div');
-          particle.className = 'c';
-          particle.style.width = particleSize;
-          particle.style.height = particleSize;
-          particle.style.animationDelay = `${i * 0.01}s`;
-          particle.style.backgroundColor = `hsl(${baseHue + (i / totalParticles) * 40}, 100%, 70%)`;
-          particle.style.animationName = `orbit${i}`;
-          particle.style.animationDuration = time;
-          wrap.appendChild(particle);
+        const particle = document.createElement('div');
+        particle.className = 'c';
+        particle.style.position = 'absolute'; // Ensure absolute positioning
+        particle.style.left = '50%';          // Center horizontally in wrap
+        particle.style.top = '50%';           // Center vertically in wrap
+        // Transforms will be relative to this center point
+        particle.style.width = particleSize;
+        particle.style.height = particleSize;
+        particle.style.animationDelay = `${i * (parseFloat(time) / totalParticles) * 0.5}s`; // Staggered start
+        particle.style.backgroundColor = `hsl(${baseHue + (i / totalParticles) * 40}, 100%, 70%)`;
+        particle.style.animationName = `flowParticle${i}`; // Use new animation name
+        particle.style.animationDuration = time;
+        particle.style.animationIterationCount = 'infinite'; // Loop animation
+        wrap.appendChild(particle);
       }
     });
   </script>
