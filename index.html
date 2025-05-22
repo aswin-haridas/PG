@@ -24,6 +24,21 @@
       color: #ff6200;
       cursor: pointer;
     }
+
+    #particle-container {
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: 70%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    #wrap {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
   </style>
   <title>...</title>
 </head>
@@ -31,6 +46,10 @@
 <body>
 
   <div class="add-btn" onclick="addLink()">Add</div>
+
+  <div id="particle-container">
+    <div id="wrap"></div>
+  </div>
 
   <script>
     function addLink() {
@@ -77,6 +96,105 @@
     }
 
     window.onload = loadLinks;
+  </script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const bootContainer = document.getElementById('boot-container');
+      const wrap = document.getElementById('wrap');
+
+      const totalParticles = 300;
+      const particleSize = '2px';
+      const orbSize = '100px';
+      const time = '14s';
+      const accentColor = '#FFFFFF';
+
+      const timeInMs = 14 * 1000; // 14 seconds in milliseconds
+
+      // Function to navigate after animation (simulated)
+      const navigateToEditor = () => {
+          console.log('Navigating to /editor (simulation complete!)');
+          // In a real vanilla JS application, you'd typically change the URL:
+          // window.location.href = '/editor';
+          // Or dynamically load new content
+          alert('Simulation complete! You would now navigate to the editor page.');
+      };
+
+      // Set up navigation after animation completes
+      setTimeout(navigateToEditor, timeInMs);
+
+      // Convert hex color to HSL
+      const hexToHSL = (hex) => {
+          hex = hex.replace(/^#/, '');
+          const r = parseInt(hex.slice(0, 2), 16) / 255;
+          const g = parseInt(hex.slice(2, 4), 16) / 255;
+          const b = parseInt(hex.slice(4, 6), 16) / 255;
+
+          const max = Math.max(r, g, b);
+          const min = Math.min(r, g, b);
+          let h, s, l = (max + min) / 2;
+
+          if (max === min) {
+              h = s = 0; // achromatic
+          } else {
+              const d = max - min;
+              s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+              switch (max) {
+                  case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                  case g: h = (b - r) / d + 2; break;
+                  case b: h = (r - g) / d + 4; break;
+              }
+              h /= 6;
+          }
+
+          return {
+              h: Math.round(h * 360),
+              s: Math.round(s * 100),
+              l: Math.round(l * 100)
+          };
+      };
+
+      const { h: baseHue } = hexToHSL(accentColor);
+
+      // Generate and append keyframes dynamically
+      const style = document.createElement('style');
+      let keyframes = '';
+
+      for (let i = 1; i <= totalParticles; i++) {
+          keyframes += `
+              @keyframes orbit${i} {
+                  20% {
+                      opacity: 1;
+                  }
+                  30% {
+                      transform: rotateZ(${Math.random() * 360}deg) rotateY(${Math.random() * 360}deg) translateX(${orbSize}) rotateZ(${Math.random() * 360}deg);
+                  }
+                  80% {
+                      transform: rotateZ(${Math.random() * 360}deg) rotateY(${Math.random() * 360}deg) translateX(${orbSize}) rotateZ(${Math.random() * 360}deg);
+                      opacity: 1;
+                  }
+                  100% {
+                      transform: rotateZ(${Math.random() * 360}deg) rotateY(${Math.random() * 360}deg) translateX(calc(${orbSize} * 3)) rotateZ(${Math.random() * 360}deg);
+                  }
+              }
+          `;
+      }
+      style.innerHTML = keyframes;
+      document.head.appendChild(style);
+
+      // Create and append particles
+      for (let i = 1; i <= totalParticles; i++) {
+          const particle = document.createElement('div');
+          particle.className = 'c';
+          particle.style.width = particleSize;
+          particle.style.height = particleSize;
+          particle.style.animationDelay = `${i * 0.01}s`;
+          particle.style.backgroundColor = `hsl(${baseHue + (i / totalParticles) * 40}, 100%, 70%)`;
+          particle.style.animationName = `orbit${i}`;
+          particle.style.animationDuration = time;
+          wrap.appendChild(particle);
+      }
+    });
   </script>
 </body>
 
