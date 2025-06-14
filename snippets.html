@@ -19,6 +19,7 @@
         margin: 0;
         padding: 0;
         color: #ffffff;
+        overflow-x: hidden; /* Hide horizontal scrollbar */
       }
 
       a {
@@ -32,7 +33,7 @@
       }
 
       .add-btn {
-        color: #ff6200;
+        color: #9370db; /* Purple color */
         cursor: pointer;
         padding: 10px;
         text-align: center;
@@ -59,7 +60,7 @@
       }
 
       .home-btn {
-        color: #4caf50; /* Green color */
+        color: #ff6200;
         cursor: pointer;
         padding: 10px;
         text-align: center;
@@ -91,7 +92,6 @@
         top: 0;
         z-index: 100;
         justify-content: center;
-        padding: 10px 0;
       }
 
       .content-container {
@@ -103,7 +103,6 @@
         overflow-y: auto;
         flex-grow: 1;
         width: 100%;
-        scrollbar-width: thin;
         box-sizing: border-box;
         max-width: 900px;
       }
@@ -115,6 +114,7 @@
         border-radius: 5px;
         width: 100%;
         margin-bottom: 20px;
+        box-sizing: border-box; /* Include padding in width calculation */
       }
 
       .form-group {
@@ -136,10 +136,12 @@
         color: #fff;
         font-family: "JetBrains Mono", monospace;
         border-radius: 3px;
+        box-sizing: border-box; /* Include padding in width calculation */
       }
 
       .form-group textarea {
         min-height: 150px;
+        resize: vertical; /* Only allow vertical resizing */
       }
 
       .btn {
@@ -221,6 +223,7 @@
         padding: 10px;
         overflow-x: auto;
         white-space: pre;
+        max-width: 100%; /* Ensure code blocks don't exceed container width */
       }
 
       .snippet-description {
@@ -270,6 +273,26 @@
           opacity: 0;
         }
       }
+
+      /* Hide scrollbar but allow scrolling */
+      .content-container::-webkit-scrollbar {
+        display: none; /* Safari and Chrome */
+      }
+
+      .content-container {
+        -ms-overflow-style: none; /* IE and Edge */
+        scrollbar-width: none; /* Firefox */
+      }
+
+      pre {
+        max-width: 100%;
+        overflow-x: auto;
+      }
+
+      code {
+        word-wrap: normal;
+        max-width: 100%;
+      }
     </style>
     <title>Code Snippets</title>
   </head>
@@ -277,8 +300,8 @@
   <body>
     <main class="container">
       <div class="nav-container">
-        <nav class="home-btn" onclick="goToHome()">Home</nav>
-        <nav class="add-btn" onclick="toggleAddForm()">Add Snippet</nav>
+        <nav class="home-btn" onclick="goToHome()">Bookmarks</nav>
+        <nav class="add-btn" onclick="toggleAddForm()">Add</nav>
       </div>
 
       <div class="content-container">
