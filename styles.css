@@ -310,3 +310,33 @@ code {
   word-wrap: normal;
   max-width: 100%;
 }
+
+/* Styles for the Add Bookmark Modal */
+#add-bookmark-modal {
+  /* Use snippet-form for base styling, but override/add for modal behavior */
+  position: fixed; /* Or absolute, depending on desired behavior relative to viewport or parent */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%; /* Adjust width as needed, make it responsive */
+  max-width: 500px; /* Maximum width for larger screens */
+  z-index: 1001; /* Ensure it's above other content, like the nav's 100 */
+  /* display: none; is already set by inline style and .snippet-form, but good to keep in mind */
+}
+
+/* Optional: Add a backdrop for the modal */
+.modal-backdrop {
+  display: none; /* Hidden by default, shown when modal is active */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+  z-index: 1000; /* Below the modal, above other content */
+}
+
+/* Prevent underline on hover for specific delete bookmark button */
+.delete-bookmark-btn:hover {
+  text-decoration: none !important;
+}

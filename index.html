@@ -14,12 +14,29 @@
   <body>
     <main class="bookmarks-container" id="bookmarks-container">
       <div class="nav-container">
-        <nav class="add-btn" onclick="addLink()">Add</nav>
+        <nav class="add-btn" onclick="toggleBookmarkModal()">Add</nav>
         <nav class="snippets-btn" onclick="showSnippets()">Snippets</nav>
       </div>
       <div class="links-container" id="links-container">
         <!-- Bookmarks will be loaded here -->
       </div>
+    <div class="snippet-form" id="add-bookmark-modal" style="display: none;">
+      <h2 id="bookmark-form-title">Add New Bookmark</h2>
+      <form id="add-bookmark-form">
+        <div class="form-group">
+          <label for="bookmark-url">URL:</label>
+          <input type="url" id="bookmark-url" required />
+        </div>
+        <div class="form-group">
+          <label for="bookmark-name">Name:</label>
+          <input type="text" id="bookmark-name" required />
+        </div>
+        <div class="form-buttons">
+          <button type="submit" class="btn btn-primary">Save Bookmark</button>
+          <button type="button" class="btn btn-secondary" onclick="toggleBookmarkModal()">Cancel</button>
+        </div>
+      </form>
+    </div>
     </main>
 
     <div class="toast" id="toast">Bookmark saved!</div>

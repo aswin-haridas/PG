@@ -52,6 +52,83 @@ function initializeDB() {
 }
 
 // Bookmarks page functions
+// Toggle bookmark modal
+function toggleBookmarkModal() {
+  const modal = document.getElementById("add-bookmark-modal");
+  if (modal.style.display === "block") {
+    modal.style.display = "none";
+  } else {
+    modal.style.display = "block";
+    // Optionally, clear form fields when opening, or focus on the first input
+    document.getElementById("bookmark-url").value = "";
+    document.getElementById("bookmark-name").value = "";
+    document.getElementById("bookmark-url").focus();
+  }
+}
+
+// Handle Add Bookmark Form Submission
+async function handleAddBookmarkSubmit(event) {
+  event.preventDefault(); // Prevent default form submission
+
+  const url = document.getElementById("bookmark-url").value.trim();
+  const name = document.getElementById("bookmark-name").value.trim();
+
+  if (url && name) {
+    try {
+      const id = Date.now().toString();
+      const bookmark = { _id: id, url, name };
+
+      const transaction = db.transaction([BOOKMARK_STORE], "readwrite");
+      const objectStore = transaction.objectStore(BOOKMARK_STORE);
+      const request = objectStore.add(bookmark);
+
+      request.onerror = function (e) {
+        console.error("Error adding bookmark:", e.target.error);
+        showToast("Failed to add bookmark. Please try again.");
+      };
+
+      request.onsuccess = function () {
+        const newLink = document.createElement("a");
+        newLink.href = bookmark.url;
+        newLink.textContent = bookmark.name;
+        newLink.setAttribute("data-id", bookmark._id);
+        newLink.style.display = "block";
+        newLink.style.textAlign = "center";
+
+        const deleteBtn = document.createElement("span");
+        deleteBtn.className = "delete-bookmark-btn"; // Ensure class is added
+        deleteBtn.textContent = " ×";
+        deleteBtn.style.color = "#ff6200";
+        deleteBtn.style.cursor = "pointer";
+        deleteBtn.style.marginLeft = "10px";
+        deleteBtn.onclick = function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          deleteBookmark(bookmark._id); // Assumes deleteBookmark is defined
+        };
+
+        newLink.appendChild(deleteBtn);
+
+        // If the "No bookmarks found" message is present, remove it
+        const noBookmarksMessage = document.querySelector("#links-container > p");
+        if (noBookmarksMessage && noBookmarksMessage.textContent.includes("No bookmarks found")) {
+            noBookmarksMessage.remove();
+        }
+
+        document.getElementById("links-container").appendChild(newLink);
+        showToast("Bookmark added!");
+        toggleBookmarkModal(); // Close the modal
+      };
+    } catch (error) {
+      console.error("Error saving bookmark:", error);
+      showToast("Failed to add bookmark. Please try again.");
+    }
+  } else {
+    showToast("URL and name are required.");
+  }
+}
+
+/*
 async function addLink() {
   const url = prompt("Enter the URL:");
   const name = prompt("Enter the name for the link:");
@@ -176,6 +253,7 @@ async function loadLinks() {
 
         // Add delete button
         const deleteBtn = document.createElement("span");
+        deleteBtn.className = "delete-bookmark-btn";
         deleteBtn.textContent = " ×";
         deleteBtn.style.color = "#ff6200";
         deleteBtn.style.cursor = "pointer";
@@ -538,5 +616,11 @@ document.addEventListener("DOMContentLoaded", function () {
   if (window.location.href.includes("snippets.html")) {
     hljs.highlightAll();
     setupSnippetForm();
+  } else {
+    // We are on index.html (bookmarks page)
+    const addBookmarkForm = document.getElementById("add-bookmark-form");
+    if (addBookmarkForm) {
+      addBookmarkForm.addEventListener("submit", handleAddBookmarkSubmit);
+    }
   }
 });
